@@ -46,11 +46,12 @@ for url in urls:
     d['date'] = info.find('span').get_text().strip()    
     d['status'] = info.find('em').get_text().strip()
     d['country'] = info.find('a').get_text().strip()
+    d['election'] = info.find('h5').get_text().strip()
 
     # Append dictionary to list 
     election_info.append(d)
 
-# Create dataframe
+# Create DataFrame
 df = pd.DataFrame(election_info)    
 
 # Clean up dates
