@@ -9,7 +9,6 @@ def getElectionURLs():
     """ Gets the unique URLs for each election identified by IFES.
     
     """
-    
     # import libraries
     import requests
     from bs4 import BeautifulSoup
@@ -31,7 +30,7 @@ def getElectionURLs():
         urls.append(url.get_text())
         
     return urls
-    
+   
 from datetime import datetime
 
 urls = getElectionURLs()
