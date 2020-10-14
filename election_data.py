@@ -64,7 +64,6 @@ def getElectionData():
 
 # import libraries
 from datetime import datetime
-import pandas as pd
 
 election_df = getElectionData()
 
