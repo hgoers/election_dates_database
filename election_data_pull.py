@@ -1,61 +1,70 @@
 # -*- coding: utf-8 -*-
 """
-Created on Tue Sep  8 17:57:55 2020
-
+Created on Wed Oct 14 18:45:30 2020
 @author: hgoer
 """
 
-# Import libraries
-import requests
-from bs4 import BeautifulSoup
-import pandas as pd
-from collections import OrderedDict
+def getElectionData():
+    # import libraries
+    import requests
+    from bs4 import BeautifulSoup
+    import pandas as pd
+    from datetime import datetime
+    
+    # get URLs
+    urls = []
+    
+    with open("elections_list_LDI_" + str(datetime.now().date()) + ".txt", "r") as filehandle:
+        for line in filehandle:
+            url = line[:-1]
+            urls.append(url)
+            
+    # specify empty lists for variables
+    country_list = []
+    election_list = []
+    date_list = []
+    status_list = []
+    
+    # iterate over each election
+    for url in urls:
+        # fetch URLs one by one
+        page = requests.get(url)
+        
+        # process data
+        soup = BeautifulSoup(page.content, "html.parser")
+        
+        # get country
+        country = soup.find("div", {"class": "titles"}).h3
+        country_list.append(country.get_text().strip())
+        
+        # get election
+        election = soup.find("div", {"class": "titles"}).h5
+        election_list.append(election.get_text().strip())
+        
+        # get date
+        date = soup.find("section", {"class": "box election-country"}).h3.span
+        date_list.append(date.get_text().strip())
+        
+        # get status
+        status = soup.find("section", {"class": "box election-country"}).h3.em
+        status_list.append(status.get_text().strip())
+    
+    # create database
+    df = pd.DataFrame.from_dict({'country': country_list,
+                                 'election': election_list,
+                                 'date': date_list,
+                                 'status': status_list})
+    
+    # clean up dates
+    df['date'] = pd.to_datetime(df['date'], errors='ignore')
+    
+    return
+    df
 
-# Request URL
-page = requests.get("https://www.electionguide.org/sitemap-election.xml")
+# import libraries
+from datetime import datetime
 
-# Fetch webpage
-soup = BeautifulSoup(page.content, "html.parser")
+election_df = getElectionData()
 
-# Get URLs
-content = soup.find_all("loc")
-
-urls = []
-
-for i in range(len(content)):
-    temp = str(content[i]).strip('<loc>')[:-2]
-    urls.append(temp)
-
-# Create list to store information
-election_info = []
-
-# Iterate over each election
-for url in urls:
-    d = OrderedDict()
-
-    # Fetch URLs one by one
-    request = requests.get(url)
-
-    # Data processing
-    content = request.content
-    soup = BeautifulSoup(content,"html.parser")
-
-    # Scraping Data
-    info = soup.find_all('section')[11]
-
-    d['date'] = info.find('span').get_text().strip()    
-    d['status'] = info.find('em').get_text().strip()
-    d['country'] = info.find('a').get_text().strip()
-    d['election'] = info.find('h5').get_text().strip()
-
-    # Append dictionary to list 
-    election_info.append(d)
-
-# Create DataFrame
-df = pd.DataFrame(election_info)    
-
-# Clean up dates
-df['date'] = pd.to_datetime(df['date'], errors='ignore')
-
-# Save to csv
-df.to_csv('Election_dates.csv', index=False)
+# save to csv with LDI
+election_df.to_csv("election_dates_LDI_" + str(datetime.now().date()) + ".csv", index=False)
