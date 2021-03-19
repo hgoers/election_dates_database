@@ -1,11 +1,7 @@
-# election_dates_database
+# Comprehensive global election database
 
-This repo contains the code I use to generate and update a comprehensive list of elections held globally. The data are pulled from https://www.electionguide.org/. 
-
-## How to use:
-1. Collect the unqiue URLs for each election using election_url_pull.
-2. Collect data for each election using election_data_pull. 
+This repo contains the R code that I use to generate and update a comprehensive list of elections held globally. The data are pulled from https://www.electionguide.org/. 
 
 ## What you get:
-1. A .txt file containing the unique URLs, with LDI. 
-2. A .csv file containing the election data, with LDI. 
+1. A .rda file containing the database, with the date of the last pull. 
+2. A .csv file containing the database, with the date of the last pull. 
